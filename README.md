@@ -1,23 +1,23 @@
-# Serilog.Sinks.LogDNA #
+# Serilog.Sinks.LogDNA.Mod
+Platforms - .NET 4.5, netstandard2.0 for Serilog Sinks.
 
-Serilog Sink that sends log events to LogDNA https://logdna.com
+Based off of the work done by iojancode @ https://github.com/iojancode/Serilog.Sinks.LogDNA
+```
+Install-Package Serilog.Sinks.LogDNA.Mod
+```
 
-**Package** - [Serilog.Sinks.LogDNA](http://nuget.org/packages/serilog.sinks.logdna) | **Platforms** - .NET 4.5, netstandard2.0
-
-Example:
-```csharp
+example
+```c#
 var log = new LoggerConfiguration()
-    .WriteTo.LogDNA(apiKey: "<API_KEY>", appName: "myapp")
+    .WriteTo.SinkLogDNA(SetupSinkHttpConfiguration())
     .CreateLogger();
 
-var position = new { Latitude = 25, Longitude = 134 };
-var elapsedMs = 34;
-log.Information("Processed {@Position} in {Elapsed:000} ms.", position, elapsedMs);
+ static SinkHttpConfiguration SetupSinkHttpConfiguration()
+        {
+            return new SinkHttpConfiguration(apikey:"7b1723643523339a3872f2e56c52d741")
+            {
+                AppName = "EDSv2",
+                CommaSeparatedTags = $"App-EDSv2,Host-{Environment.MachineName}"
+            };
+        }
 ```
-
-Prints to LogDNA console:
-```
-Oct 10 16:09:13 desktop-r9hnrih myapp Information Processed { Latitude: 25, Longitude: 134 } in 034 ms.
-```
-
-[![Nuget](https://img.shields.io/nuget/v/serilog.sinks.logdna.svg)](https://www.nuget.org/packages/Serilog.Sinks.LogDNA/)
