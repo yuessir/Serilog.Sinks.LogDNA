@@ -37,7 +37,7 @@ namespace Serilog.Sinks.LogDNA
         public int BatchPostingLimit { get; set; } = 50;
         public int? QueueLimit { get; set; } = 100;
         public TimeSpan? Period { get; set; } = TimeSpan.FromSeconds(15);
-        public LogEventLevel RestrictedToMinimumLevel { get; set; } = LogEventLevel.Warning;
+        public LogEventLevel RestrictedToMinimumLevel { get; set; } = LevelAlias.Minimum;
         public DurableBufferMode BufferMode { get; set; } = DurableBufferMode.Hour;
     }
 }
