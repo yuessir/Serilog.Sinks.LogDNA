@@ -1,14 +1,9 @@
 using System;
 using System.Net;
 using Serilog.Configuration;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Sinks.Http;
-using Serilog.Sinks.Http.BatchFormatters;
-using Serilog.Sinks.Http.Private.Network;
-using Serilog.Sinks.Http.Private.Sinks;
-using Serilog.Sinks.Http.TextFormatters;
 using Serilog.Sinks.LogDNA;
 
 namespace Serilog
@@ -74,7 +69,7 @@ namespace Serilog
             IHttpClient httpClient = new LogdnaHttpClient(apiKey);
             return sinkConfiguration.DurableHttp(requestUri, bufferPathFormat, bufferFileSizeLimitBytes, retainedBufferFileCountLimit, batchPostingLimit, period.Value, textFormatter, batchFormatter, httpClient);
         }
-
+        [Obsolete]
         public static LoggerConfiguration LogDNA(
             this LoggerSinkConfiguration sinkConfiguration,
             string apiKey,
@@ -105,6 +100,7 @@ namespace Serilog
                 restrictedToMinimumLevel: restrictedToMinimumLevel,
                 httpClient: new LogdnaHttpClient(apiKey));
         }
+        [Obsolete]
         public static LoggerConfiguration SinkLogDNA(
             this LoggerSinkConfiguration sinkConfiguration,
             ISinkHttpConfiguration logDNAConfiguration)
@@ -128,6 +124,7 @@ namespace Serilog
                 restrictedToMinimumLevel: logDNAConfiguration.RestrictedToMinimumLevel,
                 httpClient: new LogdnaHttpClient(logDNAConfiguration.ApiKey));
         }
+        [Obsolete]
         public static LoggerConfiguration SinkLogDNA(
             this LoggerSinkConfiguration sinkConfiguration,
             string apiKey,
