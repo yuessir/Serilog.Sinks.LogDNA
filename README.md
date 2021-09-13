@@ -24,3 +24,10 @@ var log = new LoggerConfiguration()
             };
         }
 ```
+
+```c#
+var log = new LoggerConfiguration()
+    .WriteToLogDna(x => x.ApiKey = "7b1723643523339a3872f2e56c52d741")
+    .CreateLogger();
+
+```

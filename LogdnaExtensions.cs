@@ -1,5 +1,8 @@
 using System;
+using System.Linq.Expressions;
 using System.Net;
+using System.Runtime.Serialization;
+using System.Xml.Schema;
 using Serilog.Configuration;
 using Serilog.Events;
 using Serilog.Formatting;
@@ -8,8 +11,57 @@ using Serilog.Sinks.LogDNA;
 
 namespace Serilog
 {
+
+
     public static class LogdnaExtensions
     {
+        public static LoggerConfiguration WriteToLogDna(this LoggerSinkConfiguration sinkConfiguration, Action<ISinkHttpConfiguration> ex)
+        {
+            var config = new SinkHttpConfiguration();
+            ex(config);
+            if (sinkConfiguration == null) throw new ArgumentNullException(nameof(sinkConfiguration));
+            if (string.IsNullOrWhiteSpace(config.ApiKey)) throw new ArgumentNullException(nameof(config.ApiKey));
+            if (string.IsNullOrWhiteSpace(config.IngestUrl)) throw new ArgumentNullException(nameof(config.IngestUrl));
+
+            config.IngestUrl += (config.IngestUrl.Contains("?") ? "&" : "?") + $"hostname={Dns.GetHostName().ToLower()}";
+            if (config.CommaSeparatedTags != null) config.IngestUrl += $"&tags={WebUtility.UrlEncode(config.CommaSeparatedTags)}";
+
+            var envName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ??
+                          Environment.GetEnvironmentVariable("ASPNET_ENVIRONMENT");
+            if (sinkConfiguration == null)
+                throw new ArgumentNullException(nameof(sinkConfiguration));
+            config.Period = (config.Period ?? TimeSpan.FromSeconds(2.0));
+            ITextFormatter textFormatter = new LogdnaTextFormatter(config.AppName ?? "unknown", envName);
+            IBatchFormatter batchFormatter = new LogdnaBatchFormatter();
+            IHttpClient httpClient = new LogdnaHttpClient(config.ApiKey);
+            return sinkConfiguration.Http(config.IngestUrl, config.BatchPostingLimit, config.QueueLimit.Value, config.Period.Value,
+                textFormatter, batchFormatter, config.RestrictedToMinimumLevel, httpClient);
+
+
+        }
+        public static LoggerConfiguration WriteToLogDnaDurable(this LoggerSinkConfiguration sinkConfiguration, Action<ISinkHttpConfiguration> ex)
+        {
+            var config = new SinkHttpConfiguration();
+            ex(config);
+            if (sinkConfiguration == null) throw new ArgumentNullException(nameof(sinkConfiguration));
+            if (string.IsNullOrWhiteSpace(config.ApiKey)) throw new ArgumentNullException(nameof(config.ApiKey));
+            if (string.IsNullOrWhiteSpace(config.IngestUrl)) throw new ArgumentNullException(nameof(config.IngestUrl));
+
+            config.IngestUrl += (config.IngestUrl.Contains("?") ? "&" : "?") + $"hostname={Dns.GetHostName().ToLower()}";
+            if (config.CommaSeparatedTags != null) config.IngestUrl += $"&tags={WebUtility.UrlEncode(config.CommaSeparatedTags)}";
+
+            var envName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ??
+                          Environment.GetEnvironmentVariable("ASPNET_ENVIRONMENT");
+            if (sinkConfiguration == null)
+                throw new ArgumentNullException(nameof(sinkConfiguration));
+            config.Period = (config.Period ?? TimeSpan.FromSeconds(2.0));
+            ITextFormatter textFormatter = new LogdnaTextFormatter(config.AppName ?? "unknown", envName);
+            IBatchFormatter batchFormatter = new LogdnaBatchFormatter();
+            IHttpClient httpClient = new LogdnaHttpClient(config.ApiKey);
+            return sinkConfiguration.DurableHttp(config.IngestUrl, config.BufferPathFormat, config.BufferFileSizeLimitBytes, config.RetainedBufferFileCountLimit, config.BatchPostingLimit, config.Period.Value, textFormatter, batchFormatter, config.RestrictedToMinimumLevel);
+
+
+        }
         public static LoggerConfiguration HttpLogDna(this LoggerSinkConfiguration sinkConfiguration, string apiKey,
             string appName = null,
             string commaSeparatedTags = null,
@@ -67,7 +119,7 @@ namespace Serilog
             textFormatter = textFormatter ?? new LogdnaTextFormatter(appName ?? "unknown", envName);
             batchFormatter = batchFormatter ?? new LogdnaBatchFormatter();
             IHttpClient httpClient = new LogdnaHttpClient(apiKey);
-            return sinkConfiguration.DurableHttp(requestUri, bufferPathFormat, bufferFileSizeLimitBytes, retainedBufferFileCountLimit, batchPostingLimit, period.Value, textFormatter, batchFormatter, httpClient);
+            return sinkConfiguration.DurableHttp(requestUri, bufferPathFormat, bufferFileSizeLimitBytes, retainedBufferFileCountLimit, batchPostingLimit, period.Value, textFormatter, batchFormatter, restrictedToMinimumLevel);
         }
         [Obsolete]
         public static LoggerConfiguration LogDNA(
