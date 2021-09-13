@@ -21,7 +21,7 @@ namespace Serilog.Sinks.LogDNA
 
         public async Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content)
         {
-           return await client.PostAsync(requestUri, content).ConfigureAwait(false);
+           return await client.PostAsync(requestUri, content);
       
         }
 

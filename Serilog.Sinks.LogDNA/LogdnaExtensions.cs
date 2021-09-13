@@ -15,7 +15,7 @@ namespace Serilog
 
     public static class LogdnaExtensions
     {
-        public static LoggerConfiguration WriteToLogDna(this LoggerSinkConfiguration sinkConfiguration, Action<ISinkHttpConfiguration> ex)
+        public static LoggerConfiguration WriteToLogDna(this LoggerConfiguration sinkConfiguration, Action<ISinkHttpConfiguration> ex)
         {
             var config = new SinkHttpConfiguration();
             ex(config);
@@ -34,12 +34,13 @@ namespace Serilog
             ITextFormatter textFormatter = new LogdnaTextFormatter(config.AppName ?? "unknown", envName);
             IBatchFormatter batchFormatter = new LogdnaBatchFormatter();
             IHttpClient httpClient = new LogdnaHttpClient(config.ApiKey);
-            return sinkConfiguration.Http(config.IngestUrl, config.BatchPostingLimit, config.QueueLimit.Value, config.Period.Value,
+ 
+            return sinkConfiguration.WriteTo.Http(config.IngestUrl, config.BatchPostingLimit, config.QueueLimit.Value, config.Period.Value,
                 textFormatter, batchFormatter, config.RestrictedToMinimumLevel, httpClient);
 
 
         }
-        public static LoggerConfiguration WriteToLogDnaDurable(this LoggerSinkConfiguration sinkConfiguration, Action<ISinkHttpConfiguration> ex)
+        public static LoggerConfiguration WriteToLogDnaDurable(this LoggerConfiguration sinkConfiguration, Action<ISinkHttpConfiguration> ex)
         {
             var config = new SinkHttpConfiguration();
             ex(config);
@@ -58,7 +59,7 @@ namespace Serilog
             ITextFormatter textFormatter = new LogdnaTextFormatter(config.AppName ?? "unknown", envName);
             IBatchFormatter batchFormatter = new LogdnaBatchFormatter();
             IHttpClient httpClient = new LogdnaHttpClient(config.ApiKey);
-            return sinkConfiguration.DurableHttp(config.IngestUrl, config.BufferPathFormat, config.BufferFileSizeLimitBytes, config.RetainedBufferFileCountLimit, config.BatchPostingLimit, config.Period.Value, textFormatter, batchFormatter, config.RestrictedToMinimumLevel);
+            return sinkConfiguration.WriteTo.DurableHttp(config.IngestUrl, config.BufferPathFormat, config.BufferFileSizeLimitBytes, config.RetainedBufferFileCountLimit, config.BatchPostingLimit, config.Period.Value, textFormatter, batchFormatter, config.RestrictedToMinimumLevel);
 
 
         }
