@@ -2,7 +2,7 @@
 github repo@
 https://github.com/yuessir/Serilog.Sinks.LogDNA.Mod.git
 
-Platforms - .NET 4.5, netstandard2.0 for Serilog Sinks.
+Platforms - .NET 4.5, netstandard2.0, .net core 3 for Serilog Sinks.
 
 Based off of the work done by iojancode @ https://github.com/iojancode/Serilog.Sinks.LogDNA
 ```
@@ -24,6 +24,8 @@ var log = new LoggerConfiguration()
             };
         }
 ```
+
+or
 
 ```c#
 var log = new LoggerConfiguration()
